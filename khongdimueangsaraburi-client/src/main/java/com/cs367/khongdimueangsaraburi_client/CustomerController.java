@@ -9,7 +9,7 @@ import java.util.List;
 @RequestMapping("/customer")
 public class CustomerController {
 
-    // ฐานข้อมูลจากร้านค้า
+    // ฐานข้อมูลของลูกค้า
     private List<String> availableItems = Arrays.asList("สินค้า A", "สินค้า B", "สินค้า C");
 
     // 1. บริการดึงข้อมูลสินค้าจากเจ้าของร้าน
