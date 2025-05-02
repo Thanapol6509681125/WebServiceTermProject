@@ -16,20 +16,17 @@ public class ProviderController {
             new Item("P003", "น้ำผึ้งเดือนห้า", "ของดีจากธรรมชาติ", "อำเภอพระพุทธบาท")
     ));
 
-    // บริการจองสินค้า
     @PostMapping("/reserve")
     public String reserveItem(@RequestBody Item item) {
         reservedItems.add(item);
         return "ระบบได้บันทึกการจองของ: " + item.getName() + " แล้วเรียบร้อย";
     }
 
-    // บริการแจ้งเตือนให้มารับสินค้า
     @PostMapping("/notify-pickup")
     public String notifyPickup(@RequestBody Item item) {
         return "แจ้งเตือน: กรุณามารับสินค้า '" + item.getName() + "' ที่ " + item.getLocation();
     }
 
-    // แสดงสินค้าที่ถูกจอง
     @GetMapping("/reserved-items")
     public List<Item> getReservedItems() {
         return reservedItems;

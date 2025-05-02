@@ -15,7 +15,6 @@ public class CustomerController {
     public CustomerController(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
 
-        // preload some data
         if (itemRepository.count() == 0) {
             itemRepository.saveAll(List.of(
                 new Item("P001", "ข้าวเกรียบว่าว", "อาหารพื้นเมือง", "อำเภอเสาไห้"),
