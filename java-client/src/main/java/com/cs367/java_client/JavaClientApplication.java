@@ -1,6 +1,7 @@
 package com.cs367.java_client;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -8,47 +9,57 @@ import java.net.http.HttpResponse;
 
 @SpringBootApplication
 public class JavaClientApplication {
-	
-		public static void main(String[] args) throws Exception {
-			
-			HttpClient client = HttpClient.newHttpClient();
-	
-			
-			HttpRequest request = HttpRequest.newBuilder()
-					.uri(new URI("http://localhost:8081/customer/all-products"))  // เปลี่ยนพอร์ตและ URL ให้ถูกต้อง
-					.build();
-	
-			
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("Response from customer service: " + response.body());
-	
-			
-			request = HttpRequest.newBuilder()
-					.uri(new URI("http://localhost:8081/customer/reserve-item"))
-					.header("Content-Type", "application/json")
-					.POST(HttpRequest.BodyPublishers.ofString("\"สินค้า A\""))
-					.build();
-	
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("Response from customer service: " + response.body());
-	
-			
-			request = HttpRequest.newBuilder()
-					.uri(new URI("http://localhost:8080/provider/notify-pickup"))
-					.header("Content-Type", "application/json")
-					.POST(HttpRequest.BodyPublishers.ofString("\"สินค้า A\""))
-					.build();
-	
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("Response from provider service: " + response.body());
-	
-			
-			request = HttpRequest.newBuilder()
-					.uri(new URI("http://localhost:8080/provider/reserved-items"))
-					.build();
-	
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("Response from provider service: " + response.body());
-		}
-	}
-	
+
+    public static void main(String[] args) throws Exception {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        // JSON แสดงข้อมูลสินค้า
+        String itemJson = """
+        {
+          "id": "P001",
+          "name": "ข้าวเกรียบว่าว",
+          "category": "อาหารพื้นเมือง",
+          "location": "อำเภอเสาไห้"
+        }
+        """;
+
+        // เรียกดูสินค้าทั้งหมดจากฝั่งลูกค้า
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8081/saraburi-customer/all-products"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("🛒 รายการสินค้าทั้งหมดจากลูกค้า: \n" + response.body());
+
+        // ส่งคำขอจองสินค้าไปยังลูกค้า
+        request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8081/saraburi-customer/reserve-item"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(itemJson))
+                .build();
+
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("✅ การจองสินค้าฝั่งลูกค้า: " + response.body());
+
+        // ส่งคำขอแจ้งเตือนไปรับสินค้าไปยังผู้ให้บริการ
+        request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/saraburi-provider/notify-pickup"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(itemJson))
+                .build();
+
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("📣 การแจ้งเตือนจากผู้ให้บริการ: " + response.body());
+
+        // เรียกรายการสินค้าที่ถูกจองจากฝั่งผู้ให้บริการ
+        request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/saraburi-provider/reserved-items"))
+                .GET()
+                .build();
+
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("📦 รายการสินค้าที่ถูกจองจากผู้ให้บริการ: \n" + response.body());
+    }
+}

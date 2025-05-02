@@ -1,31 +1,37 @@
 package com.cs367.khongdimueangsaraburi;
 
+import com.cs367.khongdimueangsaraburi.Item;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/provider")
+@RequestMapping("/saraburi-provider")
 public class ProviderController {
 
-    // ฐานข้อมูลจากร้านค้า
-    private List<String> reservedItems = List.of("สินค้า A", "สินค้า B", "สินค้า C");
+    private List<Item> reservedItems = new ArrayList<>(List.of(
+            new Item("P001", "ข้าวเกรียบว่าว", "อาหารพื้นเมือง", "อำเภอเสาไห้"),
+            new Item("P002", "ผ้าขาวม้า", "ของฝาก", "อำเภอแก่งคอย"),
+            new Item("P003", "น้ำผึ้งเดือนห้า", "ของดีจากธรรมชาติ", "อำเภอพระพุทธบาท")
+    ));
 
-    // 1. บริการสำหรับการจองสินค้า
+    // บริการจองสินค้า
     @PostMapping("/reserve")
-    public String reserveItem(@RequestBody String item) {
-        return "จองสินค้า: " + item + " สำเร็จ";
+    public String reserveItem(@RequestBody Item item) {
+        reservedItems.add(item);
+        return "ระบบได้บันทึกการจองของ: " + item.getName() + " แล้วเรียบร้อย";
     }
 
-    // 2. บริการสำหรับการแจ้งเตือนให้มารับสินค้า
+    // บริการแจ้งเตือนให้มารับสินค้า
     @PostMapping("/notify-pickup")
-    public String notifyPickup(@RequestBody String item) {
-        return "โปรดมารับสินค้า: " + item;
+    public String notifyPickup(@RequestBody Item item) {
+        return "แจ้งเตือน: กรุณามารับสินค้า '" + item.getName() + "' ที่ " + item.getLocation();
     }
 
-    // 3. บริการแสดงรายการสินค้าที่ถูกจอง
+    // แสดงสินค้าที่ถูกจอง
     @GetMapping("/reserved-items")
-    public List<String> getReservedItems() {
+    public List<Item> getReservedItems() {
         return reservedItems;
     }
 }
