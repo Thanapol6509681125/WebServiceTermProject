@@ -1,4 +1,4 @@
-package com.cs367.khongdimueangsaraburi;
+package com.cs367.java_client;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

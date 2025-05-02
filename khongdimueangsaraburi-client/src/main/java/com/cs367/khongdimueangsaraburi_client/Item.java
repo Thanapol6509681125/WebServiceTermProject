@@ -1,11 +1,11 @@
 package com.cs367.khongdimueangsaraburi_client;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "items")
 public class Item {
+
     @Id
     private String id;
     private String name;
@@ -21,14 +21,16 @@ public class Item {
         this.location = location;
     }
 
-    // Getter & Setter
+    // Getters & Setters
     public String getId() { return id; }
-    public String getName() { return name; }
-    public String getCategory() { return category; }
-    public String getLocation() { return location; }
-
     public void setId(String id) { this.id = id; }
+
+    public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 }

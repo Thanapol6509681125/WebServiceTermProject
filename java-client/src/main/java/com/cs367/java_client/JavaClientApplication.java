@@ -1,69 +1,43 @@
 package com.cs367.java_client;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.Arrays;
 
-@SpringBootApplication
 public class JavaClientApplication {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
 
-        public static void main(String[] args) throws Exception {
+        // 1. ขอรายการสินค้าทั้งหมดจากผู้ให้บริการ
+        String allProductsUrl = "http://localhost:8081/saraburi-customer/all-products"; 
+        ResponseEntity<Item[]> response = restTemplate.getForEntity(allProductsUrl, Item[].class);
+        System.out.println("📦 สินค้าทั้งหมดจากผู้ให้บริการ:");
+        Arrays.stream(response.getBody()).forEach(item -> 
+            System.out.println("- " + item.getName() + " (" + item.getCategory() + ")")
+        );
 
-                HttpClient client = HttpClient.newHttpClient();
+        // 2. เลือกจองสินค้า 1 รายการ
+        Item selectedItem = new Item("P001", "ข้าวเกรียบว่าว", "อาหารพื้นเมือง", "อำเภอเสาไห้");
+        String reserveUrl = "http://localhost:8081/saraburi-customer/reserve-item";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Item> request = new HttpEntity<>(selectedItem, headers);
 
-                String itemJson = """
-                                {
-                                  "id": "P001",
-                                  "name": "ข้าวเกรียบว่าว",
-                                  "category": "อาหารพื้นเมือง",
-                                  "location": "อำเภอเสาไห้"
-                                }
-                                """;
+        String reserveResponse = restTemplate.postForObject(reserveUrl, request, String.class);
+        System.out.println("\n✅ ผลการจอง: " + reserveResponse);
 
-                String itemJson2 = """
-                                {
-                                  "id": "P002",
-                                  "name": "ผ้าขาวม้า",
-                                  "category": "ของฝาก",
-                                  "location": "อำเภอแก่งคอย"
-                                }
-                                """;
+        // 3. ผู้ให้บริการแจ้งให้มารับสินค้า
+        String notifyUrl = "http://localhost:8080/saraburi-provider/notify-pickup";
+        String notifyResponse = restTemplate.postForObject(notifyUrl, request, String.class);
+        System.out.println("\n📣 การแจ้งเตือน: " + notifyResponse);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                                .uri(new URI("http://localhost:8081/saraburi-customer/all-products"))
-                                .GET()
-                                .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("🛒 รายการสินค้าทั้งหมดจากลูกค้า: \n" + response.body());
-
-                request = HttpRequest.newBuilder()
-                                .uri(new URI("http://localhost:8081/saraburi-customer/reserve-item"))
-                                .header("Content-Type", "application/json")
-                                .POST(HttpRequest.BodyPublishers.ofString(itemJson2))
-                                .build();
-
-                response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("✅ การจองสินค้าฝั่งลูกค้า: " + response.body());
-
-                request = HttpRequest.newBuilder()
-                                .uri(new URI("http://localhost:8080/saraburi-provider/notify-pickup"))
-                                .header("Content-Type", "application/json")
-                                .POST(HttpRequest.BodyPublishers.ofString(itemJson2))
-                                .build();
-
-                response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("📣 การแจ้งเตือนจากผู้ให้บริการ: " + response.body());
-
-                request = HttpRequest.newBuilder()
-                                .uri(new URI("http://localhost:8080/saraburi-provider/reserved-items"))
-                                .GET()
-                                .build();
-
-                response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("📦 รายการสินค้าที่ถูกจองจากผู้ให้บริการ: \n" + response.body());
-        }
+        // 4. ขอข้อมูลรายการสินค้าที่ลูกค้าจองไว้
+        String reservedListUrl = "http://localhost:8081/saraburi-customer/my-reservations";
+        ResponseEntity<Item[]> reservedList = restTemplate.getForEntity(reservedListUrl, Item[].class);
+        System.out.println("\n📋 รายการสินค้าที่ลูกค้าจองไว้:");
+        Arrays.stream(reservedList.getBody()).forEach(item -> 
+            System.out.println("- " + item.getName() + " (" + item.getLocation() + ")")
+        );
+    }
 }
