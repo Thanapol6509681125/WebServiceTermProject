@@ -14,7 +14,6 @@ public class JavaClientApplication {
 
         HttpClient client = HttpClient.newHttpClient();
 
-        // JSON แสดงข้อมูลสินค้า
         String itemJson = """
         {
           "id": "P001",
@@ -24,7 +23,6 @@ public class JavaClientApplication {
         }
         """;
 
-        // เรียกดูสินค้าทั้งหมดจากฝั่งลูกค้า
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:8081/saraburi-customer/all-products"))
                 .GET()
@@ -33,7 +31,6 @@ public class JavaClientApplication {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("🛒 รายการสินค้าทั้งหมดจากลูกค้า: \n" + response.body());
 
-        // ส่งคำขอจองสินค้าไปยังลูกค้า
         request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:8081/saraburi-customer/reserve-item"))
                 .header("Content-Type", "application/json")
@@ -43,7 +40,6 @@ public class JavaClientApplication {
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("✅ การจองสินค้าฝั่งลูกค้า: " + response.body());
 
-        // ส่งคำขอแจ้งเตือนไปรับสินค้าไปยังผู้ให้บริการ
         request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:8080/saraburi-provider/notify-pickup"))
                 .header("Content-Type", "application/json")
@@ -53,7 +49,6 @@ public class JavaClientApplication {
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("📣 การแจ้งเตือนจากผู้ให้บริการ: " + response.body());
 
-        // เรียกรายการสินค้าที่ถูกจองจากฝั่งผู้ให้บริการ
         request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:8080/saraburi-provider/reserved-items"))
                 .GET()
