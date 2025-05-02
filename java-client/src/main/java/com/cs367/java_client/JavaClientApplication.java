@@ -23,14 +23,14 @@ public class JavaClientApplication {
                                 }
                                 """;
 
-                /*String itemJson = """
+                String itemJson2 = """
                                 {
-                                  "id": "P002",  // เปลี่ยน ID ของสินค้า
-                                  "name": "ผ้าขาวม้า",  // เปลี่ยนชื่อสินค้า
-                                  "category": "ของฝาก",  // เปลี่ยนประเภท
-                                  "location": "อำเภอแก่งคอย"  // เปลี่ยนสถานที่
+                                  "id": "P002",
+                                  "name": "ผ้าขาวม้า",
+                                  "category": "ของฝาก",
+                                  "location": "อำเภอแก่งคอย"
                                 }
-                                """;*/
+                                """;
 
                 HttpRequest request = HttpRequest.newBuilder()
                                 .uri(new URI("http://localhost:8081/saraburi-customer/all-products"))
@@ -43,7 +43,7 @@ public class JavaClientApplication {
                 request = HttpRequest.newBuilder()
                                 .uri(new URI("http://localhost:8081/saraburi-customer/reserve-item"))
                                 .header("Content-Type", "application/json")
-                                .POST(HttpRequest.BodyPublishers.ofString(itemJson))
+                                .POST(HttpRequest.BodyPublishers.ofString(itemJson2))
                                 .build();
 
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -52,7 +52,7 @@ public class JavaClientApplication {
                 request = HttpRequest.newBuilder()
                                 .uri(new URI("http://localhost:8080/saraburi-provider/notify-pickup"))
                                 .header("Content-Type", "application/json")
-                                .POST(HttpRequest.BodyPublishers.ofString(itemJson))
+                                .POST(HttpRequest.BodyPublishers.ofString(itemJson2))
                                 .build();
 
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
